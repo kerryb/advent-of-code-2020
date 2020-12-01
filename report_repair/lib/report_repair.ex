@@ -5,13 +5,15 @@ defmodule ReportRepair do
       |> String.split("\n", trim: true)
       |> Enum.map(&String.to_integer/1)
 
-    Enum.find_value(numbers, &find_and_multiply_pair(&1, numbers))
+    numbers
+    |> Enum.find_value(&find_pair(&1, numbers))
+    |> Enum.reduce(&*/2)
   end
 
-  defp find_and_multiply_pair(value, numbers) do
+  defp find_pair(value, numbers) do
     case Enum.find(numbers, &(&1 + value == 2020)) do
       nil -> nil
-      number -> value * number
+      number -> [value, number]
     end
   end
 end
