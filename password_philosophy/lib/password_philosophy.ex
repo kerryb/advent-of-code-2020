@@ -1,4 +1,8 @@
 defmodule PasswordPhilosophy do
+  @moduledoc """
+  https://adventofcode.com/2020/day/2
+  """
+
   @doc ~S'''
       iex> input = """
       ...> 1-3 a: abcde

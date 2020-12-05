@@ -1,4 +1,8 @@
 defmodule PassportProcessing do
+  @moduledoc """
+  https://adventofcode.com/2020/day/4
+  """
+
   @doc ~S'''
       iex> input = """
       ...> ecl:gry pid:860033327 eyr:2020 hcl:#fffffd

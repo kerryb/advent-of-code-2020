@@ -1,4 +1,8 @@
 defmodule ReportRepair do
+  @moduledoc """
+  https://adventofcode.com/2020/day/1
+  """
+
   def find_pair(input) do
     numbers = parse(input)
 

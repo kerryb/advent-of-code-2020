@@ -1,4 +1,8 @@
 defmodule TobogganTrajectory do
+  @moduledoc """
+  https://adventofcode.com/2020/day/3
+  """
+
   @doc ~S'''
   iex> input = """
   ...> ..##.......

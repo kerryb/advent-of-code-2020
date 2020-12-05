@@ -1,4 +1,8 @@
 defmodule BinaryBoarding do
+  @moduledoc """
+  https://adventofcode.com/2020/day/5
+  """
+
   def highest_seat(input) do
     input
     |> get_seat_ids()
