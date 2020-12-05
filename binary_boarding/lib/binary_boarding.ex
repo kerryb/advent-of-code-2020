@@ -1,19 +1,30 @@
 defmodule BinaryBoarding do
+  def highest_seat(input) do
+    input
+    |> get_seat_ids()
+    |> Enum.max()
+  end
+
+  def find_seat(input) do
+    input
+    |> get_seat_ids()
+    |> find_gap()
+  end
+
   @doc ~S'''
       iex> input = """
       ...> BFFFBBFRRR
       ...> FFFBBBFRRR
       ...> BBFFBBFRLL
       ...> """
-      ...> BinaryBoarding.highest_seat(input)
-      820
+      ...> BinaryBoarding.get_seat_ids(input)
+      [567, 119, 820]
   '''
-  def highest_seat(input) do
+  def get_seat_ids(input) do
     input
     |> parse()
     |> decode()
     |> generate_ids()
-    |> Enum.max()
   end
 
   defp parse(input) do
@@ -44,4 +55,15 @@ defmodule BinaryBoarding do
 
   defp generate_ids(seats), do: Enum.map(seats, &generate_id/1)
   defp generate_id({row, column}), do: row * 8 + column
+
+  @doc """
+      iex> BinaryBoarding.find_gap([6, 4, 8, 5, 9])
+      7
+  """
+  def find_gap(ids) do
+    ids
+    |> Enum.sort()
+    |> Enum.chunk_every(2, 1, :discard)
+    |> Enum.find_value(fn [a, b] -> if b - a == 2, do: a + 1, else: false end)
+  end
 end
