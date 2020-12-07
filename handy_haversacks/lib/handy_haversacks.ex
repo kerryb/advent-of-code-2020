@@ -26,6 +26,27 @@ defmodule HandyHaversacks do
     |> Enum.count()
   end
 
+  @doc ~S'''
+      iex> input = """
+      ...> light red bags contain 1 bright white bag, 2 muted yellow bags.
+      ...> dark orange bags contain 3 bright white bags, 4 muted yellow bags.
+      ...> bright white bags contain 1 shiny gold bag.
+      ...> muted yellow bags contain 2 shiny gold bags, 9 faded blue bags.
+      ...> shiny gold bags contain 1 dark olive bag, 2 vibrant plum bags.
+      ...> dark olive bags contain 3 faded blue bags, 4 dotted black bags.
+      ...> vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.
+      ...> faded blue bags contain no other bags.
+      ...> dotted black bags contain no other bags.
+      ...> """
+      ...> HandyHaversacks.count_total_contained_bags(input)
+      32
+  '''
+  def count_total_contained_bags(input) do
+    input
+    |> parse()
+    |> count_contained_bags("shiny gold")
+  end
+
   defp parse(input) do
     input
     |> String.split("\n", trim: true)
@@ -69,5 +90,17 @@ defmodule HandyHaversacks do
         )
       )
     )
+  end
+
+  defp count_contained_bags(bags_to_contents, bag) do
+    contents = bags_to_contents[bag]
+    direct_count = contents |> Enum.map(fn {quantity, _description} -> quantity end) |> Enum.sum()
+
+    indirect_count =
+      contents
+      |> Enum.map(fn {quantity, description} -> quantity * count_contained_bags(bags_to_contents, description) end)
+      |> Enum.sum()
+
+    direct_count + indirect_count
   end
 end
