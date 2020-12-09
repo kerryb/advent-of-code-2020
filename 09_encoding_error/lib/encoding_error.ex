@@ -35,6 +35,41 @@ defmodule EncodingError do
     |> find_first_error(window)
   end
 
+  @doc ~S'''
+      iex> input = """
+      ...> 35
+      ...> 20
+      ...> 15
+      ...> 25
+      ...> 47
+      ...> 40
+      ...> 62
+      ...> 55
+      ...> 65
+      ...> 95
+      ...> 102
+      ...> 117
+      ...> 150
+      ...> 182
+      ...> 127
+      ...> 219
+      ...> 299
+      ...> 277
+      ...> 309
+      ...> 576
+      ...> """
+      ...> EncodingError.find_sequence(input, 5)
+      62
+  '''
+  def find_sequence(input, window \\ 25) do
+    numbers = parse(input)
+    total = find_first_error(numbers, window)
+
+    numbers
+    |> find_matching_sequence(total)
+    |> add_smallest_and_largest()
+  end
+
   defp parse(input) do
     input
     |> String.split("\n", trim: true)
@@ -57,5 +92,24 @@ defmodule EncodingError do
   defp find_matching_pair([head | tail], number) do
     tail |> Enum.filter(&(head + &1 == number))
     Enum.any?(tail, &(head + &1 == number)) or find_matching_pair(tail, number)
+  end
+
+  defp find_matching_sequence(numbers, total) do
+    case Enum.reduce_while(numbers, {0, []}, &sum_until_reaches(&1, &2, total)) do
+      false -> find_matching_sequence(tl(numbers), total)
+      sequence -> sequence
+    end
+  end
+
+  defp sum_until_reaches(number, {sum, sequence}, total) do
+    case number + sum do
+      ^total -> {:halt, sequence}
+      n when n > total -> {:halt, false}
+      n -> {:cont, {n, [number | sequence]}}
+    end
+  end
+
+  defp add_smallest_and_largest(sequence) do
+    Enum.min(sequence) + Enum.max(sequence)
   end
 end
