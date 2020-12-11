@@ -24,7 +24,7 @@ defmodule SeatingSystem do
     |> parse
     |> model_until_stable()
     |> Map.values()
-    |> Enum.count(& &1)
+    |> Enum.count(&(&1 == :occupied))
   end
 
   defp parse(input) do
@@ -32,7 +32,6 @@ defmodule SeatingSystem do
     |> String.split("\n", trim: true)
     |> Enum.with_index()
     |> Enum.flat_map(&parse_row/1)
-    |> Enum.reject(&is_nil/1)
     |> Enum.into(%{})
   end
 
@@ -43,9 +42,9 @@ defmodule SeatingSystem do
     |> Enum.map(&seat(&1, column_index))
   end
 
-  defp seat({".", _}, _), do: nil
-  defp seat({"L", row_index}, column_index), do: {{row_index, column_index}, false}
-  defp seat({"#", row_index}, column_index), do: {{row_index, column_index}, true}
+  defp seat({".", row_index}, column_index), do: {{row_index, column_index}, :floor}
+  defp seat({"L", row_index}, column_index), do: {{row_index, column_index}, :empty}
+  defp seat({"#", row_index}, column_index), do: {{row_index, column_index}, :occupied}
 
   defp model_until_stable(seats) do
     seats
@@ -74,9 +73,9 @@ defmodule SeatingSystem do
   end
 
   defp new_state(neighbours, state) do
-    case {state, Enum.count(neighbours, & &1)} do
-      {false, 0} -> true
-      {true, n} when n >= 4 -> false
+    case {state, Enum.count(neighbours, &(&1 == :occupied))} do
+      {:empty, 0} -> :occupied
+      {:occupied, n} when n >= 4 -> :empty
       _ -> state
     end
   end
