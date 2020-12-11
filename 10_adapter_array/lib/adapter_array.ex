@@ -49,7 +49,8 @@ defmodule AdapterArray do
     input
     |> parse()
     |> sort_with_outlet_and_built_in_adapter()
-    |> count_valid_combinations()
+    |> group_consecutive()
+    |> calculate_combinations()
   end
 
   defp parse(input) do
@@ -74,13 +75,32 @@ defmodule AdapterArray do
     Enum.sort([0, built_in | ratings])
   end
 
+  defp group_consecutive([rating | ratings]), do: group_consecutive(ratings, [[rating]])
+
+  defp group_consecutive([], groups), do: groups
+
+  defp group_consecutive([head | tail], [[previous | group] | groups])
+       when head - previous == 1 do
+    group_consecutive(tail, [[head, previous | group] | groups])
+  end
+
+  defp group_consecutive([head | tail], groups) do
+    group_consecutive(tail, [[head] | groups])
+  end
+
+  defp calculate_combinations(groups) do
+    groups
+    |> Enum.map(&count_valid_combinations/1)
+    |> Enum.reduce(&*/2)
+  end
+
   defp count_valid_combinations([]), do: 0
   defp count_valid_combinations([_]), do: 1
 
   defp count_valid_combinations([head | tail]) do
-    valid_count = tail |> Enum.take_while(&(&1 - head <= 3)) |> Enum.count()
+    valid_count = tail |> Enum.take_while(&(head - &1 <= 3)) |> Enum.count()
 
-    0..(valid_count-1)
+    0..(valid_count - 1)
     |> Enum.reduce(0, fn index, acc -> acc + count_valid_combinations(Enum.drop(tail, index)) end)
   end
 end
