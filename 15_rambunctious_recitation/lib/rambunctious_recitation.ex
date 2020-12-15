@@ -6,21 +6,21 @@ defmodule RambunctiousRecitation do
   defstruct turn: 0, last_seen: %{}, last_play: nil
 
   @doc """
-      iex> RambunctiousRecitation.play("0,3,6")
+      iex> RambunctiousRecitation.play("0,3,6", 2020)
       436
   """
-  def play(input) do
+  def play(input, turns) do
     input
     |> parse()
-    |> play_2020_turns()
+    |> play_turns(turns)
     |> Map.get(:last_play)
   end
 
   defp parse(input), do: input |> String.split(",") |> Enum.map(&String.to_integer/1)
 
-  defp play_2020_turns(starter) do
+  defp play_turns(starter, turns) do
     state = Enum.reduce(starter, %__MODULE__{}, &play_starter_turn/2)
-    Enum.reduce((length(starter) + 1)..2020, state, &play_turn/2)
+    Enum.reduce((length(starter) + 1)..turns, state, &play_turn/2)
   end
 
   defp play_starter_turn(number, state), do: update_state(state, number)
