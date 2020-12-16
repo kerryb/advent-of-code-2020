@@ -3,7 +3,7 @@ defmodule TicketTranslation do
   https://adventofcode.com/2020/day/16
   """
 
-  alias TicketTranslation.State
+  alias TicketTranslation.{State,Ticket}
 
   @doc ~S'''
       iex> input = """
@@ -31,19 +31,6 @@ defmodule TicketTranslation do
   end
 
   defp find_invalid_fields(%{rules: rules, nearby_tickets: tickets}) do
-    Enum.flat_map(tickets, &find_invalid_ticket_fields(&1, rules))
-  end
-
-  defp find_invalid_ticket_fields(ticket, rules) do
-    ticket
-    |> Tuple.to_list()
-    |> Enum.reject(&valid_field?(&1, rules))
-  end
-
-  defp valid_field?(field, rules) do
-    rules
-    |> Map.values()
-    |> List.flatten()
-    |> Enum.any?(&(field in &1))
+    Enum.flat_map(tickets, &Ticket.find_invalid_fields(&1, rules))
   end
 end
