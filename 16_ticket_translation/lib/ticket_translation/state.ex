@@ -1,6 +1,8 @@
 defmodule TicketTranslation.State do
   defstruct rules: %{}, raw_ticket: nil, ticket: nil, nearby_tickets: []
 
+  alias TicketTranslation.Ticket
+
   def from_text(input) do
     [rules, ticket, tickets] = String.split(input, "\n\n")
 
@@ -11,6 +13,11 @@ defmodule TicketTranslation.State do
     }
   end
 
+  def identify_ticket_fields(state) do
+    state.nearby_tickets
+    |> Ticket.identify_fields(state.rules)
+  end
+
   defp parse_rules_block(rules_block) do
     rules_block
     |> String.split("\n")
@@ -19,9 +26,12 @@ defmodule TicketTranslation.State do
 
   defp parse_rule(rule) do
     [label] = Regex.run(~r/^(.*):/, rule, capture: :all_but_first)
-    ranges = ~r/(\d+)-(\d+)/
-    |> Regex.scan(rule, capture: :all_but_first)
-    |> Enum.map(&parse_range/1)
+
+    ranges =
+      ~r/(\d+)-(\d+)/
+      |> Regex.scan(rule, capture: :all_but_first)
+      |> Enum.map(&parse_range/1)
+
     {label, ranges}
   end
 
